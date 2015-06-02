@@ -1,27 +1,42 @@
 # Chef server
 
-Chef server 11 on an Ubuntu Trusty 14.04 LTS
+This image contains a default configuration of Chef Server 11 based on [jakubzapletal/ubuntu:14.04.1](https://github.com/jakubzapletal/docker-ubuntu/tree/14.04.1).
 
-## Environment
-Chef is running over HTTPS/443 by default. You can however change that to another port by updating the `CHEF_PORT` variable and the expose port `-p`.
+## Using the Docker Hub
+ 
+This image is published under [Jakub Zapletal's repository on the Docker Hub](https://hub.docker.com/u/jakubzapletal/) and all you need as a prerequisite is having Docker installed on your machine.
+The container exposes the following ports:
 
-## Usage
-*With log output:*
+- `443`: Chef port
 
+Chef is running over HTTPS/443 by default.
+
+There are prepared volumes `/root` and `/var/log` where logs are saved.
+
+To start a container **with log output** you just need to run the following command:
+
+```bash
+docker run -d --privileged -e CHEF_PORT=443 -p 443:443 -v <LOCAL_PATH>:/var/log -v <LOCAL_PATH>:/root --name chef-server jakubzapletal/chef-server:11
 ```
-$ docker run --privileged -e CHEF_PORT=443 --name chef-server -d -v ~/chef-logs:/var/log -v ~/install-chef-out:/root -p 443:443 cbuisson/chef-server
+
+To start a container **without log output** you just need to run the following command:
+
+```bash
+docker run -d --privileged -e CHEF_PORT=443 -p 443:443 --name chef-server jakubzapletal/chef-server:11
 ```
 
-*Just the container:*
-
-```
-$ docker run --privileged -e CHEF_PORT=443 --name chef-server -d -p 443:443 cbuisson/chef-server
-```
+If you already have services running on your host that are using any of these ports, you may wish to map the container
+ports to whatever you want by changing the `CHEF_PORT` variable and left side number in the `-p` parameters. Find more 
+details about mapping ports in the [Docker documentation](http://docs.docker.com/userguide/dockerlinks/).
 
 Once the Chef server is configured, you can download the Knife admin keys here:
 
-```
-$ curl -Ok https://IP:CHEF_PORT/knife_admin_key.tar.gz
+```bash
+wget https://IP:CHEF_PORT/knife_admin_key.tar.gz
 ```
 
 Then un-tar that archive and point your knife.rb to the `admin.pem` and `chef-validator.pem` files.
+
+## Building the image yourself
+
+The Dockerfile and supporting configuration files are available in the Github repository. This comes specially handy if you want to change any configuration or simply if you want to know how the image was built.

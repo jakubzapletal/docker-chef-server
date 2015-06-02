@@ -14,7 +14,7 @@ ADD scripts/run.sh /usr/local/bin/
 
 CMD rsyslogd -n
 
-VOLUME /root/
+VOLUME /root
 VOLUME /var/log
 
 CMD ["run.sh"]
